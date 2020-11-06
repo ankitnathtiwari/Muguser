@@ -49,7 +49,6 @@ const isauthenticated = (req, res, next) => {
 
 //Middleware for Uploading Static Files and Images
 app.use("/uploads", express.static("uploads"));
-
 app.use(express.static("build"));
 //Allpost Important_Post and Mypost and fullPost/PostDetails route
 app.use("/post", require("./routes/post"));
@@ -58,14 +57,11 @@ app.use("/create", require("./routes/createpost"));
 //follow users route
 app.use("/connection", require("./routes/follow"));
 
-
-
-
 //Error Handling Middleware
 
 app.use((err, req, res, next) => {
-  console.log("Error Occured");
-  res.send(err);
+  console.log(err);
+  res.json(err);
 });
 
 //Listening to port number at port 8000

@@ -13,16 +13,13 @@ router.post("/register", (req, res) => {
     !req.body.username ||
     !req.body.password
   ) {
-    res.send("Please fill all details");
+    res.json({message:"Please fill all details"});
   }
   //check if username already exists or not
-  // Here you have to nest the if else in promise returned from Muguser.find .
   else if (
     Muguser.findOne({ username: req.body.username }).then((user) => {
       if (user) {
-        console.log(user);
-        console.log("user found");
-        res.send("username already exists please fill different username");
+        res.json({message:"User already exists"});
       } else {
         // Create New user with Hashed password
         console.log("New user being created");
@@ -47,26 +44,26 @@ router.post("/register", (req, res) => {
                   .then((user) => console.log(user))
                   .catch((err) => console.log(err));
 
-                res.end("New user registered");
+                res.json({message:"New user registered"});
               }
             });
           }
         });
       }
     })
-  ) {
-  }
+  );
 });
 
 // Login Module
 
 router.post("/login", (req, res, next) => {
-  passport.authenticate("local", function (err, user) {
+  passport.authenticate("local",{failureFlash:true}, function (err, user, failureFlash) {
+    console.log(user, failureFlash)
     if (err) {
       return next(err);
     }
     if (!user) {
-      return res.redirect("/login");
+      return res.json(failureFlash);
     }
     req.logIn(user, (err) =>{
       if (err) {

@@ -12,15 +12,15 @@ module.exports = function (passport) {
         Muguser.findOne({ username: username })
           .then((user) => {   
             if (!user) {
-              return done(null, false, { msg: "username doesnot exists" });
+              return done(null, false, { message: "Invalid Username/Password" });
             }
 
             bcrypt.compare(password, user.password, (err, isMatch) => {
               if (err) throw err;
               if (isMatch) {
-                return done(null, user);
+                return done(null, user, { message: "Success" });
               } else {
-                return done(null, false, { msg: "Password didn't match" });
+                return done(null, false, { message: "Invalid Username/Password" });
               }
             });
           })

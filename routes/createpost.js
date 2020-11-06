@@ -21,7 +21,9 @@ const upload = multer({ storage: storage });
 
 router.post("/createpost", upload.single("productImage"), (req, res) => {
   console.log(req.file);
-
+  if ( !req.body.Heading || !req.body.Post_Content|| !req.file ) {
+    res.json({message:"Please provide all details"});
+  }
   const newpost = new MuguserPost({
     Heading: req.body.Heading,
     Post_Content: req.body.Post_Content,
@@ -31,16 +33,12 @@ router.post("/createpost", upload.single("productImage"), (req, res) => {
     productImage: req.file.path,
   });
 
-  newpost
-    .save(err=>{return next(err)})
-    .then((post) => {
-      console.log(post);
+  newpost.save().then((post) => {
       Muguser.updateOne(
         { _id: String(post.Author) },
         { $push: { mypost: post._id } }
-      ).then(res.send("Post Created"));
-    })
-    .catch(next(err));
+      ).then(res.json({message:"Post Created"}));
+    }).catch(err=>next(err));
 });
 
 //Edit posts
@@ -52,14 +50,14 @@ router.put("/editpost", (req, res) => {
     { $set: { Post_Content: req.body.Post_Content } }
   )
     .then(res.send("Document Updated"))
-    .catch(next(err));
+    .catch(err=>next(err));
 });
 
 router.delete("/deletepost", (req, res) => {
   console.log(req.body);
   MuguserPost.deleteOne({ _id: req.body.post_id }, (error) =>
     console.log(error)
-  ).then((data) => res.send(data)).catch(next(err));
+  ).then((data) => res.send(data)).catch(err=>next(err));
 });
 
 module.exports = router;
